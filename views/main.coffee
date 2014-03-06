@@ -1,7 +1,8 @@
 main = ()-> 
   source = original.value
-  console.log(parse(source))
-  # OUTPUT.innerHTML = parse(original.val)
+  tree = parse(source)
+  console.log(tree)
+  OUTPUT.innerHTML = JSON.stringify(tree, undefined,2)
   #alert "Hello world! #{source}"
   #console.log /hello/.bexec("hello")
   #console.log 'hello 324 "hi"'.tokens()
@@ -14,7 +15,7 @@ window.onload = ()->
   RegExp.prototype.bexec = function(str) {
     var i = this.lastIndex;
     var m = this.exec(str);
-    if (m && m.index == i) return m;
+    if (m && m.index === i) return m;
     return null;
   };
 
@@ -115,36 +116,72 @@ parse = function(input) {
     }
   };
 
-  var expression = function() {
-    term();
-    if (lookahead.type === '+') { 
-      match('+');
-      expression();
+  var statements = function() {
+    var result = [ statement() ];
+    while (lookahead && lookahead.type === ';') {
+      match(';');
+      result.push(statement());
     }
+    return result.length === 1? result[0] : result;
+  };
+
+  var statement = function() {
+    var result = null;
+
+    if (lookahead && lookahead.type === 'ID') {
+      var left = { type: 'ID', value: lookahead.value };
+      match('ID');
+      match('=');
+      right = expression();
+      result = { type: '=', left: left, right: right };
+    } else if (lookahead && lookahead.type === 'P') {
+      match('P');
+      right = expression();
+      result = { type: 'P', value: right };
+    } else { // Error!
+    }
+    return result;
+  };
+
+  var expression = function() {
+    var result = term();
+    if (lookahead && lookahead.type === '+') { 
+      match('+');
+      var right = expression();
+      result = {type: '+', left: result, right: right};
+    }
+    return result;
   };
 
   var term = function() {
-    factor();
-    if (lookahead.type === '*') { 
+    var result = factor();
+    if (lookahead && lookahead.type === '*') { 
       match('*');
-      term();
+      var right = term();
+      result = {type: '*', left: result, right: right};
     }
+    return result;
   };
 
   var factor = function() {
+    var result = null;
+
     if (lookahead.type === 'NUM') { 
-      match('NUM');
+      result = {type: 'NUM', value: lookahead.value};
+      match('NUM'); 
     }
     else if (lookahead.type === 'ID') {
+      result = {type: 'ID', value: lookahead.value};
       match('ID');
     }
     else if (lookahead.type === '(') {
       match('(');
-      expression();
+      result = expression();
       match(')');
     } else { // Throw exception
     }
+    return result;
   };
-  expression(input);
+  return statements(input);
 }
 `

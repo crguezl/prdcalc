@@ -1,17 +1,21 @@
 main = ()-> 
   source = original.value
-  tree = parse(source)
-  console.log(tree)
-  OUTPUT.innerHTML = JSON.stringify(tree, undefined,2)
-  #alert "Hello world! #{source}"
-  #console.log /hello/.bexec("hello")
-  #console.log 'hello 324 "hi"'.tokens()
-
+  try 
+    result = parse(source)
+  catch result
+  OUTPUT.innerHTML = JSON.stringify(result, undefined, 2)
 
 window.onload = ()-> 
   PARSE.onclick = main
   
 `
+  Object.constructor.prototype.error = function (message, t) {
+      t = t || this;
+      t.name = "SyntaxError";
+      t.message = message;
+      throw t;
+  };
+
   RegExp.prototype.bexec = function(str) {
     var i = this.lastIndex;
     var m = this.exec(str);
@@ -94,94 +98,86 @@ window.onload = ()->
       return result;
   };
 
+  var parse = function(input) {
+    var tokens = input.tokens();
+    var lookahead = tokens.shift();
 
-parse = function(input) {
-  var tokens = input.tokens();
-  var lookahead = tokens.shift();
-
-  var error = function (message, t) {
-      t = t || this;
-      t.name = "SyntaxError";
-      t.message = message;
-      throw t;
-  };
-
-  var match = function(t) {
-    if (lookahead.type === t) {
-      lookahead = tokens.shift();
-      if (typeof lookahead === 'undefined') {
-       lookahead = null;
-      } else { // Error. Throw exception
+    var match = function(t) {
+      if (lookahead.type === t) {
+        lookahead = tokens.shift();
+        if (typeof lookahead === 'undefined') {
+         lookahead = null;
+        } else { // Error. Throw exception
+        }
       }
-    }
-  };
+    };
 
-  var statements = function() {
-    var result = [ statement() ];
-    while (lookahead && lookahead.type === ';') {
-      match(';');
-      result.push(statement());
-    }
-    return result.length === 1? result[0] : result;
-  };
+    var statements = function() {
+      var result = [ statement() ];
+      while (lookahead && lookahead.type === ';') {
+        match(';');
+        result.push(statement());
+      }
+      return result.length === 1? result[0] : result;
+    };
 
-  var statement = function() {
-    var result = null;
+    var statement = function() {
+      var result = null;
 
-    if (lookahead && lookahead.type === 'ID') {
-      var left = { type: 'ID', value: lookahead.value };
-      match('ID');
-      match('=');
-      right = expression();
-      result = { type: '=', left: left, right: right };
-    } else if (lookahead && lookahead.type === 'P') {
-      match('P');
-      right = expression();
-      result = { type: 'P', value: right };
-    } else { // Error!
-    }
-    return result;
-  };
+      if (lookahead && lookahead.type === 'ID') {
+        var left = { type: 'ID', value: lookahead.value };
+        match('ID');
+        match('=');
+        right = expression();
+        result = { type: '=', left: left, right: right };
+      } else if (lookahead && lookahead.type === 'P') {
+        match('P');
+        right = expression();
+        result = { type: 'P', value: right };
+      } else { // Error!
+      }
+      return result;
+    };
 
-  var expression = function() {
-    var result = term();
-    if (lookahead && lookahead.type === '+') { 
-      match('+');
-      var right = expression();
-      result = {type: '+', left: result, right: right};
-    }
-    return result;
-  };
+    var expression = function() {
+      var result = term();
+      if (lookahead && lookahead.type === '+') { 
+        match('+');
+        var right = expression();
+        result = {type: '+', left: result, right: right};
+      }
+      return result;
+    };
 
-  var term = function() {
-    var result = factor();
-    if (lookahead && lookahead.type === '*') { 
-      match('*');
-      var right = term();
-      result = {type: '*', left: result, right: right};
-    }
-    return result;
-  };
+    var term = function() {
+      var result = factor();
+      if (lookahead && lookahead.type === '*') { 
+        match('*');
+        var right = term();
+        result = {type: '*', left: result, right: right};
+      }
+      return result;
+    };
 
-  var factor = function() {
-    var result = null;
+    var factor = function() {
+      var result = null;
 
-    if (lookahead.type === 'NUM') { 
-      result = {type: 'NUM', value: lookahead.value};
-      match('NUM'); 
-    }
-    else if (lookahead.type === 'ID') {
-      result = {type: 'ID', value: lookahead.value};
-      match('ID');
-    }
-    else if (lookahead.type === '(') {
-      match('(');
-      result = expression();
-      match(')');
-    } else { // Throw exception
-    }
-    return result;
-  };
-  return statements(input);
-}
+      if (lookahead.type === 'NUM') { 
+        result = {type: 'NUM', value: lookahead.value};
+        match('NUM'); 
+      }
+      else if (lookahead.type === 'ID') {
+        result = {type: 'ID', value: lookahead.value};
+        match('ID');
+      }
+      else if (lookahead.type === '(') {
+        match('(');
+        result = expression();
+        match(')');
+      } else { // Throw exception
+      }
+      return result;
+    };
+    return statements(input);
+  }
 `

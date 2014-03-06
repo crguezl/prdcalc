@@ -8,7 +8,7 @@ main = ()->
 
 window.onload = ()-> 
   PARSE.onclick = main
-  
+
 `
   Object.constructor.prototype.error = function (message, t) {
       t = t || this;
@@ -110,8 +110,8 @@ window.onload = ()->
          lookahead = null;
         } 
       } else { // Error. Throw exception
-          throw "Syntax Error. Expected "+t+" found "+lookahead.value+
-                "near '"+input.substr(lookahead.from)+"'";
+          throw "Syntax Error. Expected "+t+" found '"+lookahead.value+
+                "' near '"+input.substr(lookahead.from)+"'";
       }
     };
 
@@ -181,9 +181,17 @@ window.onload = ()->
         result = expression();
         match(')');
       } else { // Throw exception
+        throw "Syntax Error. Expected number or identifier or '(' but found "+
+              (lookahead? lookahead.value : "end of input")+
+              " near '"+input.substr(lookahead.from)+"'";
       }
       return result;
     };
-    return statements(input);
+    var tree = statements(input);
+    if (lookahead != null) {
+        throw "Syntax Error parsing statements. Expected end of input and found '"+
+              input.substr(lookahead.from)+"'";
+    }
+    return tree;
   }
 `

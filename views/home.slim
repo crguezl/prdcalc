@@ -1,17 +1,19 @@
 p This website contains a simple example of a recursive descent parser
-img src="/images/st.gif" alt="Syntax Tree"
+/img src="/images/st.gif" alt="Syntax Tree"
 erb:
   <div id="header" class="header">
-    Load example to parse
-    <div style="width:70%;margin:auto;">  
+    <p>Load example to parse</p>
+    <div>  
       <textarea autofocus cols = "80" rows = "5" id="original"></textarea>
     </div>
     <br />
     <div style="display:inline">
-      <button id ="example1" type="button" onclick="dump('/examples/example1.txt');">example1</button>
-      <button id ="example2"  type="button" onclick="dump('/examples/example2.txt');">example2</button>
-      <button id ="example3"  type="button" onclick="dump('/examples/example3.txt');">example3</button>
-      <input type="file" id="files"/> 
+      <div class="loadfile">
+        <button id ="example1" type="button" onclick="dump('/examples/example1.txt');">example1</button>
+        <button id ="example2"  type="button" onclick="dump('/examples/example2.txt');">example2</button>
+        <button id ="example3"  type="button" onclick="dump('/examples/example3.txt');">example3</button>
+        <input type="file" id="files"/> 
+      </div>
       <script type="text/javascript">
         function dump(fileName) {
           $.get(fileName, function (data) {

@@ -3,7 +3,8 @@ main = ()->
   try 
     result = parse(source)
   catch result
-  OUTPUT.innerHTML = JSON.stringify(result, undefined, 2)
+
+  OUTPUT.innerHTML = JSON.stringify(result, null, 2)
 
 window.onload = ()-> 
   PARSE.onclick = main
@@ -107,8 +108,10 @@ window.onload = ()->
         lookahead = tokens.shift();
         if (typeof lookahead === 'undefined') {
          lookahead = null;
-        } else { // Error. Throw exception
-        }
+        } 
+      } else { // Error. Throw exception
+          throw "Syntax Error. Expected "+t+" found "+lookahead.value+
+                "near '"+input.substr(lookahead.from)+"'";
       }
     };
 
@@ -135,6 +138,9 @@ window.onload = ()->
         right = expression();
         result = { type: 'P', value: right };
       } else { // Error!
+        throw "Syntax Error. Expected identifier but found "+
+              (lookahead? lookahead.value : "end of input")+
+              " near '"+input.substr(lookahead.from)+"'";
       }
       return result;
     };

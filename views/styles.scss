@@ -1,6 +1,7 @@
 $red: #903;
 $black: #444;
 $white: #fff;
+$blue: #002EB8;
 $main-font: Helvetica, Arial, sans-serif;
 
 body {
@@ -81,4 +82,34 @@ nav a.current {
     height: 28px;
     padding-left: 24px;
   }
+}
+
+.loadfile {
+  background-color: $black;
+  border-radius: 5px;
+  border: 2px solid #DDD;
+  line-height: 80px;
+  
+  //width: 75%;
+  height: 20px;
+  padding: 5px;
+
+  button, input {
+    color: $black;
+    float: left;
+    list-style: none;
+
+    display: inline;
+    text-align: center;
+    font-weight: bolder;
+  }
+   
+  button:hover, input:hover {
+    cursor:pointer;
+  }
+}
+   
+.error {
+  color: $white;
+  background-color: $red;
 }

@@ -1,10 +1,11 @@
 main = ()-> 
   source = original.value
   try 
-    result = parse(source)
+    result = JSON.stringify(parse(source), null, 2)
   catch result
+    result = '<div class="error">'+result+'</div>'
 
-  OUTPUT.innerHTML = JSON.stringify(result, null, 2)
+  OUTPUT.innerHTML = result
 
 window.onload = ()-> 
   PARSE.onclick = main

@@ -1,0 +1,47 @@
+<p> This website contains a simple example of a predictive parser
+</p>
+<!-- <img src="/images/st.gif" alt="Syntax Tree"/> 
+-->
+  <div id="header" class="header">
+    <p>Load example to parse</p>
+    <div>  
+      <textarea autofocus cols = "80" rows = "5" id="original"></textarea>
+    </div>
+    <br />
+    <div>
+      <div class="loadfile">
+        <button id ="example1" type="button" onclick="dump('/examples/example1.txt');">example1</button>
+        <button id ="example2"  type="button" onclick="dump('/examples/example2.txt');">example2</button>
+        <button id ="example3"  type="button" onclick="dump('/examples/example3.txt');">example3</button>
+        <button id ="exampleerr"  type="button" onclick="dump('/examples/example_err.txt');">example_err</button>
+        <input type="file" id="files"/> 
+      </div>
+      <script type="text/javascript">
+        function dump(fileName) {
+          $.get(fileName, function (data) {
+            $("#original").val(data);
+           });
+        };
+
+        document.getElementById('files').addEventListener('change', CopyMe, false);
+
+        function CopyMe(evt) {
+          var file = evt.target.files[0];
+            if (file) {
+              var reader = new FileReader();
+                reader.onload = function(e) { 
+                  original.innerHTML = e.target.result;
+                    }
+                    var c = reader.readAsText(file);
+                }
+            else { alert("Failed to load file"); }
+        }
+
+
+       </script>
+       <script type="text/javascript" src="javascripts/main.js"></script>
+     </div>
+  </div>    
+  <input id="PARSE" value=parse type=button class="mylink">
+  <pre id=OUTPUT></pre>
+

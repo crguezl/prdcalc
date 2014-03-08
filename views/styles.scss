@@ -58,7 +58,7 @@ label {
 }
 
 nav a.current {
-  background: lighten($black, 5%);
+  background: lighten($black, 50%);
 }
 
 .flash {
@@ -112,4 +112,8 @@ nav a.current {
 .error {
   color: $white;
   background-color: $red;
+}
+
+#generatedlang {
+  text-align: center;
 }

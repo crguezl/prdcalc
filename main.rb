@@ -36,6 +36,10 @@ get '/' do
   slim :home
 end
 
+get '/grammar' do
+  slim :grammar
+end
+
 not_found do
   slim :not_found
 end

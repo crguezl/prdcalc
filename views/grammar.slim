@@ -1,0 +1,50 @@
+script[type="text/javascript" src="path-to-mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"]
+script[type="text/x-mathjax-config"]
+  |  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}}); 
+script[type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"]
+
+a#backtomain[href="/"]
+  | Back to main page
+br
+|  Recuerde que una gramática $G$ es una cuaterna $G =(\Sigma,V,P,S)$. 
+ol
+  li
+    | $\Sigma$ es el conjunto de terminales. 
+  li
+    | $V$ es un conjunto (disjunto de $\Sigma$) que se denomina conjunto de 
+    i
+      | variables sintácticas
+    |  o 
+    i
+      | categorías gramáticales
+    | , 
+  li
+    | $P$ es un conjunto de pares de $V \times (V \cup \Sigma )^*$. En vez de escribir un par usando la notación $(A, \alpha) \in P$ se escribe $A \rightarrow \alpha$. Un elemento de $P$ se denomina producción. 
+  li
+    | Por último, $S$ es un símbolo del conjunto $V$ que se denomina símbolo de arranque. 
+
+| Esta es la gramática para nuestra práctica:
+
+ol
+  li
+    |  $\Sigma = \{ ; =, ID, P, +, *, (, ), NUM \}$, 
+  li
+    |  $V = \{ statements, statement, expression, term, factor \}$ 
+  li
+    |  Productions: 
+    ol
+      li
+        |  statements $ \rightarrow$ statement ';' statements $\vert$ statement 
+      li
+        |  statement $ \rightarrow$ ID '=' expression $\vert$ P expression 
+      li
+        |  expression $ \rightarrow$ term '+' expression $\vert$ term 
+      li
+        |  term $ \rightarrow$ factor '*' term $\vert$ factor 
+      li
+        |  factor $ \rightarrow$ '(' expression ')' $\vert$ ID $ \vert$ NUM 
+  li
+    |  Start symbol: $statements$ 
+br
+br
+br

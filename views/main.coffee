@@ -71,7 +71,9 @@ String::tokens = ->
     from = i
     
     # Ignore whitespace and comments
-    if m = WHITES.bexec(this) or (m = ONELINECOMMENT.bexec(this)) or (m = MULTIPLELINECOMMENT.bexec(this))
+    if m = WHITES.bexec(this) or 
+           (m = ONELINECOMMENT.bexec(this)) or 
+           (m = MULTIPLELINECOMMENT.bexec(this))
       getTok()
     
     # name.
@@ -92,13 +94,14 @@ String::tokens = ->
     
     # string
     else if m = STRING.bexec(this)
-      result.push make("STRING", getTok().replace(/^["']|["']$/g, ""))
+      result.push make("STRING", 
+                        getTok().replace(/^["']|["']$/g, ""))
     
     # single-character operator
     else if m = ONECHAROPERATORS.bexec(this)
       result.push make(m[0], getTok())
     else
-      throw "Syntax error near '" + @substr(i) + "'"
+      throw "Syntax error near '#{@substr(i)}'"
   result
 
 parse = (input) ->
@@ -109,7 +112,9 @@ parse = (input) ->
       lookahead = tokens.shift()
       lookahead = null  if typeof lookahead is "undefined"
     else # Error. Throw exception
-      throw "Syntax Error. Expected " + t + " found '" + lookahead.value + "' near '" + input.substr(lookahead.from) + "'"
+      throw "Syntax Error. Expected #{t} found '" + 
+            lookahead.value + "' near '" + 
+            input.substr(lookahead.from) + "'"
     return
 
   statements = ->
@@ -140,7 +145,9 @@ parse = (input) ->
         type: "P"
         value: right
     else # Error!
-      throw "Syntax Error. Expected identifier but found " + ((if lookahead then lookahead.value else "end of input")) + " near '" + input.substr(lookahead.from) + "'"
+      throw "Syntax Error. Expected identifier but found " + 
+        (if lookahead then lookahead.value else "end of input") + 
+        " near '#{input.substr(lookahead.from)}'"
     result
 
   expression = ->
@@ -184,9 +191,14 @@ parse = (input) ->
       result = expression()
       match ")"
     else # Throw exception
-      throw "Syntax Error. Expected number or identifier or '(' but found " + ((if lookahead then lookahead.value else "end of input")) + " near '" + input.substr(lookahead.from) + "'"
+      throw "Syntax Error. Expected number or identifier or '(' but found " + 
+        (if lookahead then lookahead.value else "end of input") + 
+        " near '" + input.substr(lookahead.from) + "'"
     result
 
   tree = statements(input)
-  throw "Syntax Error parsing statements. Expected end of input and found '" + input.substr(lookahead.from) + "'"  if lookahead?
+  if lookahead?
+    throw "Syntax Error parsing statements. " + 
+      "Expected 'end of input' and found '" + 
+      input.substr(lookahead.from) + "'"  
   tree

@@ -10,189 +10,183 @@ main = ()->
 window.onload = ()-> 
   PARSE.onclick = main
 
-`
-  Object.constructor.prototype.error = function (message, t) {
-      t = t || this;
-      t.name = "SyntaxError";
-      t.message = message;
-      throw t;
-  };
+Object.constructor::error = (message, t) ->
+  t = t or this
+  t.name = "SyntaxError"
+  t.message = message
+  throw treturn
 
-  RegExp.prototype.bexec = function(str) {
-    var i = this.lastIndex;
-    var m = this.exec(str);
-    if (m && m.index === i) return m;
-    return null;
-  };
+RegExp::bexec = (str) ->
+  i = @lastIndex
+  m = @exec(str)
+  return m  if m and m.index is i
+  null
 
-  String.prototype.tokens = function () {
-      var from;                   // The index of the start of the token.
-      var i = 0;                  // The index of the current character.
-      var n;                      // The number value.
-      var m;                      // Matching
-      var result = [];            // An array to hold the results.
+String::tokens = ->
+  from = undefined # The index of the start of the token.
+  i = 0 # The index of the current character.
+  n = undefined # The number value.
+  m = undefined # Matching
+  result = [] # An array to hold the results.
+  WHITES = /\s+/g
+  ID = /[a-zA-Z_]\w*/g
+  NUM = /\b\d+(\.\d*)?([eE][+-]?\d+)?\b/g
+  STRING = /('(\\.|[^'])*'|"(\\.|[^"])*")/g
+  ONELINECOMMENT = /\/\/.*/g
+  MULTIPLELINECOMMENT = /\/[*](.|\n)*?[*]\//g
+  ONECHAROPERATORS = /([-+*\/=()&|;:,<>{}[\]])/g
+  tokens = [
+    WHITES
+    ID
+    NUM
+    STRING
+    ONELINECOMMENT
+    MULTIPLELINECOMMENT
+    ONECHAROPERATORS
+  ]
+  RESERVED_WORD = p: "P"
+  
+  # Make a token object.
+  make = (type, value) ->
+    type: type
+    value: value
+    from: from
+    to: i
 
-      var WHITES              = /\s+/g;
-      var ID                  = /[a-zA-Z_]\w*/g;
-      var NUM                 = /\b\d+(\.\d*)?([eE][+-]?\d+)?\b/g;
-      var STRING              = /('(\\.|[^'])*'|"(\\.|[^"])*")/g;
-      var ONELINECOMMENT      = /\/\/.*/g;
-      var MULTIPLELINECOMMENT = /\/[*](.|\n)*?[*]\//g;
-      var ONECHAROPERATORS    = /([-+*\/=()&|;:,<>{}[\]])/g; 
-      var tokens = [WHITES, ID, NUM, STRING, ONELINECOMMENT, 
-                    MULTIPLELINECOMMENT,  ONECHAROPERATORS ];
-      var RESERVED_WORD = { p : 'P' };
+  getTok = ->
+    str = m[0]
+    i += str.length # Warning! side effect on i
+    str
 
+  
+  # Begin tokenization. If the source string is empty, return nothing.
+  return  unless this
+  
+  # Loop through this text
+  while i < @length
+    tokens.forEach (t) -> # Only ECMAScript5
+      t.lastIndex = i
+      return
 
-      // Make a token object.
-      var make = function (type, value) {
-          return {
-              type: type,
-              value: value,
-              from: from,
-              to: i
-          };
-      };
+    from = i
+    
+    # Ignore whitespace and comments
+    if m = WHITES.bexec(this) or (m = ONELINECOMMENT.bexec(this)) or (m = MULTIPLELINECOMMENT.bexec(this))
+      getTok()
+    
+    # name.
+    else if m = ID.bexec(this)
+      rw = RESERVED_WORD[m[0]]
+      if rw
+        result.push make(rw, getTok())
+      else
+        result.push make("ID", getTok())
+    
+    # number.
+    else if m = NUM.bexec(this)
+      n = +getTok()
+      if isFinite(n)
+        result.push make("NUM", n)
+      else
+        make("NUM", m[0]).error "Bad number"
+    
+    # string
+    else if m = STRING.bexec(this)
+      result.push make("STRING", getTok().replace(/^["']|["']$/g, ""))
+    
+    # single-character operator
+    else if m = ONECHAROPERATORS.bexec(this)
+      result.push make(m[0], getTok())
+    else
+      throw "Syntax error near '" + @substr(i) + "'"
+  result
 
-      var getTok = function() {
-        var str = m[0];
-        i += str.length; // Warning! side effect on i
-        return str;
-      };
+parse = (input) ->
+  tokens = input.tokens()
+  lookahead = tokens.shift()
+  match = (t) ->
+    if lookahead.type is t
+      lookahead = tokens.shift()
+      lookahead = null  if typeof lookahead is "undefined"
+    else # Error. Throw exception
+      throw "Syntax Error. Expected " + t + " found '" + lookahead.value + "' near '" + input.substr(lookahead.from) + "'"
+    return
 
-      // Begin tokenization. If the source string is empty, return nothing.
-      if (!this) return; 
+  statements = ->
+    result = [statement()]
+    while lookahead and lookahead.type is ";"
+      match ";"
+      result.push statement()
+    (if result.length is 1 then result[0] else result)
 
-      // Loop through this text
-      while (i < this.length) {
-          tokens.forEach( function(t) { t.lastIndex = i;}); // Only ECMAScript5
-          from = i;
-          // Ignore whitespace and comments
-          if (m = WHITES.bexec(this) || 
-             (m = ONELINECOMMENT.bexec(this))  || 
-             (m = MULTIPLELINECOMMENT.bexec(this))) { getTok(); }
-          // name.
-          else if (m = ID.bexec(this)) {
-              var rw = RESERVED_WORD[m[0]];
-              if (rw) { result.push(make(rw, getTok())); }
-              else { result.push(make('ID', getTok())); }
-          } 
-          // number.
-          else if (m = NUM.bexec(this)) {
-              n = +getTok();
+  statement = ->
+    result = null
+    if lookahead and lookahead.type is "ID"
+      left =
+        type: "ID"
+        value: lookahead.value
 
-              if (isFinite(n)) {
-                  result.push(make('NUM', n));
-              } else {
-                  make('NUM', m[0]).error("Bad number");
-              }
-          } 
-          // string
-          else if (m = STRING.bexec(this)) {
-              result.push(make('STRING', getTok().replace(/^["']|["']$/g,'')));
-          // single-character operator
-          } else if (m = ONECHAROPERATORS.bexec(this)){
-              result.push(make(m[0], getTok()));
-          } else {
-            throw "Syntax error near '"+this.substr(i)+"'";
-          }
-      }
-      return result;
-  };
+      match "ID"
+      match "="
+      right = expression()
+      result =
+        type: "="
+        left: left
+        right: right
+    else if lookahead and lookahead.type is "P"
+      match "P"
+      right = expression()
+      result =
+        type: "P"
+        value: right
+    else # Error!
+      throw "Syntax Error. Expected identifier but found " + ((if lookahead then lookahead.value else "end of input")) + " near '" + input.substr(lookahead.from) + "'"
+    result
 
-  var parse = function(input) {
-    var tokens = input.tokens();
-    var lookahead = tokens.shift();
+  expression = ->
+    result = term()
+    if lookahead and lookahead.type is "+"
+      match "+"
+      right = expression()
+      result =
+        type: "+"
+        left: result
+        right: right
+    result
 
-    var match = function(t) {
-      if (lookahead.type === t) {
-        lookahead = tokens.shift();
-        if (typeof lookahead === 'undefined') {
-         lookahead = null;
-        } 
-      } else { // Error. Throw exception
-          throw "Syntax Error. Expected "+t+" found '"+lookahead.value+
-                "' near '"+input.substr(lookahead.from)+"'";
-      }
-    };
+  term = ->
+    result = factor()
+    if lookahead and lookahead.type is "*"
+      match "*"
+      right = term()
+      result =
+        type: "*"
+        left: result
+        right: right
+    result
 
-    var statements = function() {
-      var result = [ statement() ];
-      while (lookahead && lookahead.type === ';') {
-        match(';');
-        result.push(statement());
-      }
-      return result.length === 1? result[0] : result;
-    };
+  factor = ->
+    result = null
+    if lookahead.type is "NUM"
+      result =
+        type: "NUM"
+        value: lookahead.value
 
-    var statement = function() {
-      var result = null;
+      match "NUM"
+    else if lookahead.type is "ID"
+      result =
+        type: "ID"
+        value: lookahead.value
 
-      if (lookahead && lookahead.type === 'ID') {
-        var left = { type: 'ID', value: lookahead.value };
-        match('ID');
-        match('=');
-        right = expression();
-        result = { type: '=', left: left, right: right };
-      } else if (lookahead && lookahead.type === 'P') {
-        match('P');
-        right = expression();
-        result = { type: 'P', value: right };
-      } else { // Error!
-        throw "Syntax Error. Expected identifier but found "+
-              (lookahead? lookahead.value : "end of input")+
-              " near '"+input.substr(lookahead.from)+"'";
-      }
-      return result;
-    };
+      match "ID"
+    else if lookahead.type is "("
+      match "("
+      result = expression()
+      match ")"
+    else # Throw exception
+      throw "Syntax Error. Expected number or identifier or '(' but found " + ((if lookahead then lookahead.value else "end of input")) + " near '" + input.substr(lookahead.from) + "'"
+    result
 
-    var expression = function() {
-      var result = term();
-      if (lookahead && lookahead.type === '+') { 
-        match('+');
-        var right = expression();
-        result = {type: '+', left: result, right: right};
-      }
-      return result;
-    };
-
-    var term = function() {
-      var result = factor();
-      if (lookahead && lookahead.type === '*') { 
-        match('*');
-        var right = term();
-        result = {type: '*', left: result, right: right};
-      }
-      return result;
-    };
-
-    var factor = function() {
-      var result = null;
-
-      if (lookahead.type === 'NUM') { 
-        result = {type: 'NUM', value: lookahead.value};
-        match('NUM'); 
-      }
-      else if (lookahead.type === 'ID') {
-        result = {type: 'ID', value: lookahead.value};
-        match('ID');
-      }
-      else if (lookahead.type === '(') {
-        match('(');
-        result = expression();
-        match(')');
-      } else { // Throw exception
-        throw "Syntax Error. Expected number or identifier or '(' but found "+
-              (lookahead? lookahead.value : "end of input")+
-              " near '"+input.substr(lookahead.from)+"'";
-      }
-      return result;
-    };
-    var tree = statements(input);
-    if (lookahead != null) {
-        throw "Syntax Error parsing statements. Expected end of input and found '"+
-              input.substr(lookahead.from)+"'";
-    }
-    return tree;
-  }
-`
+  tree = statements(input)
+  throw "Syntax Error parsing statements. Expected end of input and found '" + input.substr(lookahead.from) + "'"  if lookahead?
+  tree

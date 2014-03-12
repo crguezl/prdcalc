@@ -33,14 +33,14 @@ p This website contains a simple example of a predictive parser
 
         function CopyMe(evt) {
           var file = evt.target.files[0];
-            if (file) {
-              var reader = new FileReader();
-                reader.onload = function(e) { 
-                  original.innerHTML = e.target.result;
-                    }
-                    var c = reader.readAsText(file);
-                }
-            else { alert("Failed to load file"); }
+          if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) { 
+              original.innerHTML = e.target.result;
+            }
+            reader.readAsText(file);
+          }
+          else { alert("Failed to load file"); }
         }
 
 

@@ -43,6 +43,9 @@ ol
         |  statements $ \rightarrow$ statement ';' statements $\vert$ statement 
       li
         |  statement $ \rightarrow$ ID '=' expression $\vert$ P expression 
+        |  $ \vert$ IF condition THEN statement 
+      li
+        | condition $ \rightarrow$ expression ('=='|'!='|'<'|'<='|'>'|'>=') expression 
       li
         |  expression $ \rightarrow$ term '+' expression $\vert$ term 
       li

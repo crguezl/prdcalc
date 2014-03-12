@@ -7,29 +7,26 @@ br
 |  Recuerde que una gramática $G$ es una cuaterna $G =(\Sigma,V,P,S)$. 
 ol
   li
-    | $\Sigma$ es el conjunto de terminales. 
+    | $\Sigma$ es el conjunto de <i>terminales</i>. 
   li
     | $V$ es un conjunto (disjunto de $\Sigma$) que se denomina conjunto de 
-    i
-      | variables sintácticas
-    |  o 
-    i
-      | categorías gramáticales
+    | <i>variables sintácticas</i>  o <i>categorías gramáticales</i>
     | , 
   li
-    | $P$ es un conjunto de pares de $V \times (V \cup \Sigma )^*$. En vez de escribir un par usando la notación $(A, \alpha) \in P$ se escribe $A \rightarrow \alpha$. Un elemento de $P$ se denomina producción. 
+    | $P$ es un conjunto de pares de $V \times (V \cup \Sigma )^*$.
+      En vez de escribir un par usando la notación $(A, \alpha) \in
+      P$ se escribe $A \rightarrow \alpha$. Un elemento de $P$ se
+      denomina <i>producción</i>.
   li
     | Por último, $S$ es un símbolo del conjunto $V$ que se denomina símbolo de arranque. 
   br
   | Dada una gramática $G=(\Sigma,V,P,S)$ se denota por $L(G)$ o lenguaje
-    generado por $G$ al lenguaje:
-  br
-    .centered
+    generado por $G$ al lenguaje: <br/>
+  .centered
       | $L(G) = \{ x \in \Sigma^* : S \stackrel{*}{\Longrightarrow} x \}$
   br
     | Esto es, el lenguaje generado por la gramática $G$ esta
-      formado por las cadenas de terminales que pueden ser 
-    i derivados 
+      formado por las cadenas de terminales que pueden ser <i>derivados</i> 
     | desde el símbolo de arranque.
 
 | Esta es la gramática para nuestra práctica:

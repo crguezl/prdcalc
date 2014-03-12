@@ -4,6 +4,10 @@ require 'sass'
 require 'v8'
 require 'coffee-script'
 
+configure do
+  set :static_cache_control, [:public, :no_cache, :no_store, :must_revalidate]
+end
+
 before do
   set_title
 end

@@ -34,7 +34,8 @@ String::tokens = ->
   STRING = /('(\\.|[^'])*'|"(\\.|[^"])*")/g
   ONELINECOMMENT = /\/\/.*/g
   MULTIPLELINECOMMENT = /\/[*](.|\n)*?[*]\//g
-  ONECHAROPERATORS = /([-+*\/=()&|;:,<>{}[\]])/g
+  COMPARISONOPERATOR = /[<>=!]=|[<>]/g
+  ONECHAROPERATORS = /([-+*\/=()&|;:,{}[\]])/g
   tokens = [
     WHITES
     ID
@@ -42,9 +43,13 @@ String::tokens = ->
     STRING
     ONELINECOMMENT
     MULTIPLELINECOMMENT
+    COMPARISONOPERATOR
     ONECHAROPERATORS
   ]
-  RESERVED_WORD = p: "P"
+  RESERVED_WORD = 
+    p:    "P"
+    "if": "IF"
+    then: "THEN"
   
   # Make a token object.
   make = (type, value) ->
@@ -97,6 +102,9 @@ String::tokens = ->
       result.push make("STRING", 
                         getTok().replace(/^["']|["']$/g, ""))
     
+    # comparison operator
+    else if m = COMPARISONOPERATOR.bexec(this)
+      result.push make("COMPARISON", getTok())
     # single-character operator
     else if m = ONECHAROPERATORS.bexec(this)
       result.push make(m[0], getTok())
@@ -144,10 +152,30 @@ parse = (input) ->
       result =
         type: "P"
         value: right
+    else if lookahead and lookahead.type is "IF"
+      match "IF"
+      left = condition()
+      match "THEN"
+      right = statement()
+      result =
+        type: "IF"
+        left: left
+        right: right
     else # Error!
       throw "Syntax Error. Expected identifier but found " + 
         (if lookahead then lookahead.value else "end of input") + 
         " near '#{input.substr(lookahead.from)}'"
+    result
+
+  condition = ->
+    left = expression()
+    type = lookahead.value
+    match "COMPARISON"
+    right = expression()
+    result =
+      type: type
+      left: left
+      right: right
     result
 
   expression = ->

@@ -36,7 +36,8 @@ String::tokens = ->
     ONELINECOMMENT: /\/\/.*/g
     MULTIPLELINECOMMENT: /\/[*](.|\n)*?[*]\//g
     COMPARISONOPERATOR: /[<>=!]=|[<>]/g
-    ONECHAROPERATORS: /([-+*\/=()&|;:,{}[\]])/g
+    ADDOP: /[+-]/g
+    ONECHAROPERATORS: /([*\/=()&|;:,{}[\]])/g
 
   RESERVED_WORD = 
     p:    "P"
@@ -93,6 +94,9 @@ String::tokens = ->
       result.push make("STRING", 
                         getTok().replace(/^["']|["']$/g, ""))
     
+    # add operator
+    else if m = tokens.ADDOP.bexec(this)
+      result.push make("ADDOP", getTok())
     # comparison operator
     else if m = tokens.COMPARISONOPERATOR.bexec(this)
       result.push make("COMPARISON", getTok())
@@ -171,11 +175,12 @@ parse = (input) ->
 
   expression = ->
     result = term()
-    if lookahead and lookahead.type is "+"
-      match "+"
-      right = expression()
+    while lookahead and lookahead.type is "ADDOP"
+      type = lookahead.value
+      match "ADDOP"
+      right = term()
       result =
-        type: "+"
+        type: type
         left: result
         right: right
     result

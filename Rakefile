@@ -21,3 +21,7 @@ directory 'public/javascript'
 task :clean do
   sh "rm -f public/styles.css public/javascript/main.js"
 end
+
+task :install_coffee do
+  sh "npm install --global coffeescript"
+end

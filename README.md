@@ -13,7 +13,6 @@ Esta es la gramática del lenguaje analizado por [main.js](https://github.com/cr
     6.  *factor  → '(' expression ')' | ID  | NUM*
 4.  Start symbol: *statements*
 
-* [Gramática en la Wikipedia](https://en.wikipedia.org/wiki/Recursive_descent_parser)
 
 # Práctica: Analizador Descendente Predictivo Recursivo
 

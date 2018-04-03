@@ -1,6 +1,6 @@
 # Gramática
 
-Esta es la gramática del lenguaje: 
+Esta es la gramática del lenguaje analizado por [main.js](https://github.com/crguezl/prdcalc/blob/master/views/main.js): 
 
 1.  ∑ = { ; =, ID, P, IF, THEN, <, >, <=, >=, ==, !=, +, \*, (, ), NUM },
 2.  V = { statements, statement, condition, expression, term, factor }

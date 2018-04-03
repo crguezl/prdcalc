@@ -1,3 +1,18 @@
+# Gramática
+
+Esta es la gramática del lenguaje: 
+
+1.  ∑ = { ; =, ID, P, IF, THEN, <, >, <=, >=, ==, !=, +, \*, (, ), NUM },
+2.  V = { statements, statement, condition, expression, term, factor }
+3.  Productions:
+    1.  statements  → statement ';' statements | statement
+    2.  statement  → ID '=' expression | P expression  | IF condition THEN statement
+    3.  condition  → expression ('=='|'!='|'<'|'<='|'>'|'>=') expression
+    4.  expression  → term '+' expression | term
+    5.  term  → factor '\*' term | factor
+    6.  factor  → '(' expression ')' | ID  | NUM
+4.  Start symbol: *statements*
+
 # Práctica: Analizador Descendente Predictivo Recursivo
 
 * [Deployment in Heroku](http://predictiveparser.herokuapp.com/)

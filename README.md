@@ -2,15 +2,15 @@
 
 Esta es la gramática del lenguaje analizado por [main.js](https://github.com/crguezl/prdcalc/blob/master/views/main.js): 
 
-1.  ∑ = { ; =, ID, P, IF, THEN, <, >, <=, >=, ==, !=, +, \*, (, ), NUM },
-2.  V = { statements, statement, condition, expression, term, factor }
-3.  Productions:
-    1.  statements  → statement ';' statements | statement
-    2.  statement  → ID '=' expression | P expression  | IF condition THEN statement
-    3.  condition  → expression ('=='|'!='|'<'|'<='|'>'|'>=') expression
-    4.  expression  → term '+' expression | term
-    5.  term  → factor '\*' term | factor
-    6.  factor  → '(' expression ')' | ID  | NUM
+1.  *∑ = { ; =, ID, P, IF, THEN, <, >, <=, >=, ==, !=, +, \*, (, ), NUM }*,
+2.  *V = { statements, statement, condition, expression, term, factor }*
+3.  *Productions:*
+    1.  *statements  → statement ';' statements | statement*
+    2.  *statement  → ID '=' expression | P expression  | IF condition THEN statement*
+    3.  *condition  → expression ('=='|'!='|'<'|'<='|'>'|'>=') expression*
+    4.  *expression  → term '+' expression | term*
+    5.  *term  → factor '\*' term | factor*
+    6.  *factor  → '(' expression ')' | ID  | NUM*
 4.  Start symbol: *statements*
 
 # Práctica: Analizador Descendente Predictivo Recursivo
